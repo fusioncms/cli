@@ -50,7 +50,6 @@ class NewCommand extends Command
 
         $composer = $this->findComposer();
         $commands = [
-            $composer.' help',
             $composer.' create-project fusioncms/fusioncms '.$name.' dev-master',
         ];
 
