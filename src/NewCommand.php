@@ -22,14 +22,14 @@ class NewCommand extends Command
      */
     protected function configure()
     {
-        // putenv('COMPOSER_HOME='.__DIR__.'/vendor/bin/composer');
-
         $this
             ->setName('new')
             ->setDescription('Create a new FusionCMS instance')
-            ->addArgument('name', InputArgument::OPTIONAL)
+            ->addArgument('name', InputArgument::REQUIRED)
+            ->addArgument('version', InputArgument::OPTIONAL)
             ->addOption('quiet', 'q', InputOption::VALUE_NONE, 'Do not output any message')
             ->addOption('master', 'm', InputOption::VALUE_NONE, 'Installs the latest "master" release')
+            ->addOption('beta', 'b', InputOption::VALUE_NONE, 'Installs the latest "beta" release')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists');
     }
 
@@ -43,14 +43,32 @@ class NewCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name      = $input->getArgument('name');
-        $directory = $name;
-        // $directory = $name and $name !== '.' ? getcwd().'/'.$name : getcwd();
+        $directory = $name and $name !== '.' ? getcwd().'/'.$name : getcwd();
+        $version   = $input->getArgument('version');
+        $stability = 'stable';
 
-        $output->writeln('<info>Crafting application...</info>');
+        if ($input->getOption('beta')) {
+            $stability = 'beta';
+        }
+
+        if ($input->getOption('master')) {
+            $version   = 'dev-master';
+            $stability = 'dev';
+        }
+
+        if ($version) {
+            $version = '"'.$version.'"';
+        }
+
+        if ($version) {
+            $output->writeln('<info>Downloading FusionCMS ('.$version.')...</info>');
+        } else {
+            $output->writeln('<info>Downloading FusionCMS (latest)...</info>');
+        }
 
         $composer = $this->findComposer();
         $commands = [
-            $composer.' create-project fusioncms/fusioncms '.$name.' dev-master',
+            $composer.' create-project fusioncms/fusioncms '.$directory.' '.$version.' --stability="'.$stability.'" --prefer-dist',
         ];
 
         if ($input->getOption('quiet')) {
@@ -59,7 +77,7 @@ class NewCommand extends Command
             }, $commands);
         }
 
-        $process = Process::fromShellCommandline(implode(' && ', $commands), $directory, null, null, null);
+        $process = Process::fromShellCommandline(implode(' && ', $commands));
 
         if ('\\' != DIRECTORY_SEPARATOR and file_exists('/dev/tty') and is_readable('/dev/tty')) {
             $process->setTty(true);
