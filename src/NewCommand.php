@@ -26,7 +26,7 @@ class NewCommand extends Command
             ->addOption('quiet', 'q', InputOption::VALUE_NONE, 'Do not output any message')
             ->addOption('master', 'm', InputOption::VALUE_NONE, 'Installs the latest "master" release')
             ->addOption('beta', 'b', InputOption::VALUE_NONE, 'Installs the latest "beta" release')
-            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Forces install even if the directory already exists');
+            ->addOption('no-install', null, InputOption::VALUE_NONE, 'Disables jumping into the FusionCMS installation process directly');
     }
 
     /**
@@ -51,7 +51,7 @@ class NewCommand extends Command
 
         $composer = $this->findComposer();
         $commands = [
-            $composer.' create-project fusioncms/fusioncms '.$directory.' '.$version.' --stability="'.$stability.'" --prefer-dist',
+            $composer.' create-project fusioncms/fusioncms '.$directory.' '.$version.' --stability="'.$stability.'" --prefer-dist '.($input->getOption('no-install') ? '--no-scripts' : ''),
         ];
 
         if ($input->getOption('quiet')) {
@@ -62,6 +62,8 @@ class NewCommand extends Command
 
         $process = Process::fromShellCommandline(implode(' && ', $commands));
 
+        $process->setTimeout(0);
+
         if ('\\' != DIRECTORY_SEPARATOR and file_exists('/dev/tty') and is_readable('/dev/tty')) {
             $process->setTty(true);
         }
@@ -70,7 +72,7 @@ class NewCommand extends Command
             $output->write($line);
         });
 
-        if ($process->isSuccessful()) {
+        if ($process->isSuccessful() and $input->getOption('no-install')) {
             $output->writeln('<comment>FusionCMS ready! Build something amazing.</comment>');
         }
 
