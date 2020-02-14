@@ -2,11 +2,7 @@
 
 namespace FusionCMS\CLI\Console;
 
-use ZipArchive;
-use RuntimeException;
-use GuzzleHttp\Client;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -44,26 +40,13 @@ class NewCommand extends Command
     {
         $name      = $input->getArgument('name');
         $directory = $name and $name !== '.' ? getcwd().'/'.$name : getcwd();
-        $version   = $input->getArgument('version');
-        $stability = 'stable';
-
-        if ($input->getOption('beta')) {
-            $stability = 'beta';
-        }
-
-        if ($input->getOption('master')) {
-            $version   = 'dev-master';
-            $stability = 'dev';
-        }
+        $version   = $this->getVersion($input);
+        $stability = $this->getStability($input);
 
         if ($version) {
-            $version = '"'.$version.'"';
-        }
-
-        if ($version) {
-            $output->writeln('<info>Downloading FusionCMS ('.$version.')...</info>');
+            $output->writeln('<info>Downloading FusionCMS ('.$stability.'/'.str_replace('"', '', $version).')...</info>');
         } else {
-            $output->writeln('<info>Downloading FusionCMS (latest)...</info>');
+            $output->writeln('<info>Downloading FusionCMS ('.$stability.'/latest)...</info>');
         }
 
         $composer = $this->findComposer();
@@ -94,6 +77,53 @@ class NewCommand extends Command
         return 0;
     }
 
+    /**
+     * Get the version that should be downloaded.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @return string
+     */
+    protected function getVersion(InputInterface $input)
+    {
+        $version = $input->getArgument('version');
+
+        if ($input->getOption('master')) {
+            $version = 'master';
+        }
+
+        if ($version) {
+            $version = '"'.$version.'"';
+        }
+
+        return $version;
+    }
+
+    /**
+     * Get the stability constraint based on requested version.
+     *
+     * @param  \Symfony\Component\Console\Input\InputInterface  $input
+     * @return string
+     */
+    protected function getStability(InputInterface $input)
+    {
+        $stability = 'stable';
+
+        if ($input->getOption('beta')) {
+            $stability = 'beta';
+        }
+
+        if ($input->getOption('master')) {
+            $stability = 'dev';
+        }
+
+        return $stability;
+    }
+
+    /**
+     * Get the composer command for the environment.
+     *
+     * @return string
+     */
     protected function findComposer()
     {
         $composerPath = getcwd().'/composer.phar';
