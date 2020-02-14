@@ -1,0 +1,44 @@
+{
+    "name": "fusioncms/cli",
+    "description": "CLI tool to install FusionCMS",
+    "license": "MIT",
+    "keywords": [
+        "fusioncms"
+    ],
+    "authors": [
+        {
+            "name": "Shea Lewis (Kai)",
+            "email": "shea.lewis89@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2.9",
+        "ext-zip": "*",
+        "composer/composer": "^1.9",
+        "guzzlehttp/guzzle": "^6.5",
+        "symfony/console": "^5.0",
+        "symfony/filesystem": "^5.0",
+        "symfony/process": "^5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "bin": [
+        "bin/fusion"
+    ],
+    "autoload": {
+        "psr-4": {
+            "FusionCMS\\CLI\\Console\\": "src"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
