@@ -51,8 +51,13 @@ class NewCommand extends Command
 
         $composer = $this->findComposer();
         $commands = [
-            $composer.' create-project fusioncms/fusioncms '.$directory.' '.$version.' --stability="'.$stability.'" --prefer-dist '.($input->getOption('no-install') ? '--no-scripts' : ''),
+            $composer.' create-project fusioncms/fusioncms '.$directory.' '.$version.' --stability="'.$stability.'" --prefer-dist',
         ];
+
+        if (! $input->getOption('no-install')) {
+            $commands[] = 'cd '.$directory;
+            $commands[] = 'php artisan fusion:install';
+        }
 
         if ($input->getOption('quiet')) {
             $commands = array_map(function($command) {
@@ -63,16 +68,13 @@ class NewCommand extends Command
         $process = Process::fromShellCommandline(implode(' && ', $commands));
 
         $process->setTimeout(0);
-
-        if ('\\' != DIRECTORY_SEPARATOR and file_exists('/dev/tty') and is_readable('/dev/tty')) {
-            $process->setTty(true);
-        }
+        $process->setTty(Process::isTtySupported());
 
         $process->run(function($type, $line) use ($output) {
             $output->write($line);
         });
 
-        if ($process->isSuccessful() and $input->getOption('no-install')) {
+        if ($process->isSuccessful()) {
             $output->writeln('<comment>FusionCMS ready! Build something amazing.</comment>');
         }
 
