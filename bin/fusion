@@ -7,7 +7,7 @@ if (file_exists(__DIR__.'/../../../autoload.php')) {
     require __DIR__.'/../vendor/autoload.php';
 }
 
-$app = new Symfony\Component\Console\Application('FusionCMS CLI', '1.0.2');
+$app = new Symfony\Component\Console\Application('FusionCMS CLI', '1.0.3');
 $app->add(new FusionCMS\CLI\Console\NewCommand);
 
 $app->run();

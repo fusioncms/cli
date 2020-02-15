@@ -25,7 +25,7 @@ class NewCommand extends Command
             ->addArgument('version', InputArgument::OPTIONAL)
             ->addOption('quiet', 'q', InputOption::VALUE_NONE, 'Do not output any message')
             ->addOption('master', 'm', InputOption::VALUE_NONE, 'Installs the latest "master" release')
-            ->addOption('beta', 'b', InputOption::VALUE_NONE, 'Installs the latest "beta" release')
+            // ->addOption('beta', 'b', InputOption::VALUE_NONE, 'Installs the latest "beta" release')
             ->addOption('no-install', null, InputOption::VALUE_NONE, 'Disables jumping into the FusionCMS installation process directly');
     }
 
@@ -108,11 +108,11 @@ class NewCommand extends Command
      */
     protected function getStability(InputInterface $input)
     {
-        $stability = 'stable';
+        $stability = 'beta';
 
-        if ($input->getOption('beta')) {
-            $stability = 'beta';
-        }
+        // if ($input->getOption('beta')) {
+        //     $stability = 'beta';
+        // }
 
         if ($input->getOption('master')) {
             $stability = 'dev';
