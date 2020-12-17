@@ -21,12 +21,15 @@ class NewCommand extends Command
         $this
             ->setName('new')
             ->setDescription('Create a new FusionCMS instance')
-            ->addArgument('name', InputArgument::REQUIRED)
-            ->addArgument('version', InputArgument::OPTIONAL)
-            ->addOption('quiet', 'q', InputOption::VALUE_NONE, 'Do not output any message')
-            ->addOption('master', 'm', InputOption::VALUE_NONE, 'Installs the latest "master" release')
-            // ->addOption('beta', 'b', InputOption::VALUE_NONE, 'Installs the latest "beta" release')
-            ->addOption('no-install', null, InputOption::VALUE_NONE, 'Disables jumping into the FusionCMS installation process directly');
+            
+            ->addArgument('name',    InputArgument::REQUIRED, 'Name of your new project.')
+            ->addArgument('version', InputArgument::OPTIONAL, 'Requested version.', 'dev-nightly')
+            ->addArgument('path',    InputArgument::OPTIONAL, 'Installation path')
+            
+            ->addOption('quiet',     'q',   InputOption::VALUE_NONE, 'Do not output any message')
+            // ->addOption('nightly',   'm',   InputOption::VALUE_NONE, 'Installs the latest "nightly" release')
+            ->addOption('no-install', null, InputOption::VALUE_NONE, 'Disables jumping into the FusionCMS installation process directly')
+            ;
     }
 
     /**
@@ -39,8 +42,9 @@ class NewCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name      = $input->getArgument('name');
-        $directory = $name and $name !== '.' ? getcwd().'/'.$name : getcwd();
-        $version   = $this->getVersion($input);
+        $path      = $input->getArgument('path') ?? $name;
+        $directory = $path and $path !== '.' ? getcwd().'/'.$path : getcwd();
+        $version   = $this->getArgument('version');
         $stability = $this->getStability($input);
 
         if ($version) {
@@ -51,11 +55,12 @@ class NewCommand extends Command
 
         $composer = $this->findComposer();
         $commands = [
-            $composer.' create-project fusioncms/fusioncms '.$directory.' '.$version.' --stability="'.$stability.'" --prefer-dist',
+            "{$composer} create-project laravel/laravel {$directory}",
+            "cd {$directory}",
+            "{$composer} require fusioncms/cms:{$version}",
         ];
 
         if (! $input->getOption('no-install')) {
-            $commands[] = 'cd '.$directory;
             $commands[] = 'php artisan fusion:install';
         }
 
@@ -91,8 +96,8 @@ class NewCommand extends Command
     {
         $version = $input->getArgument('version');
 
-        if ($input->getOption('master')) {
-            $version = 'master';
+        if ($input->getOption('nightly')) {
+            $version = 'dev-nightly';
         }
 
         if ($version) {
@@ -112,11 +117,7 @@ class NewCommand extends Command
     {
         $stability = 'beta';
 
-        // if ($input->getOption('beta')) {
-        //     $stability = 'beta';
-        // }
-
-        if ($input->getOption('master')) {
+        if ($input->getOption('nightly')) {
             $stability = 'dev';
         }
 
