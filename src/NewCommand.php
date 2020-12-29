@@ -28,7 +28,7 @@ class NewCommand extends Command
             
             ->addOption('quiet',     'q',   InputOption::VALUE_NONE, 'Do not output any message')
             // ->addOption('nightly',   'm',   InputOption::VALUE_NONE, 'Installs the latest "nightly" release')
-            ->addOption('install', null, InputOption::VALUE_NONE, 'Run the FusionCMS Installer after downloading.');
+            ->addOption('no-install', null, InputOption::VALUE_NONE, 'Do not automatically run the FusionCMS Installer after downloading.');
     }
 
     /**
@@ -59,7 +59,7 @@ class NewCommand extends Command
             "{$composer} require fusioncms/cms:{$version}",
         ];
 
-        if ($input->getOption('install')) {
+        if (!$input->getOption('no-install')) {
             $commands[] = 'php artisan fusion:install';
         }
 
