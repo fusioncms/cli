@@ -15,6 +15,7 @@
         "php": "^7.2.9",
         "symfony/console": "^4.0|^5.0",
         "symfony/filesystem": "^4.0|^5.0",
+        "symfony/finder": "^5.2",
         "symfony/process": "^4.2|^5.0"
     },
     "require-dev": {
@@ -27,6 +28,9 @@
         "psr-4": {
             "FusionCMS\\CLI\\Console\\": "src"
         }
+    },
+    "autoload-dev": {
+        "FusionCMS\\CLI\\Tests\\": "tests"
     },
     "extra": {
         "branch-alias": {
