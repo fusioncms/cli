@@ -51,13 +51,13 @@ class NewCommandTest extends TestCase
 
         $command = new CommandTester($app->find('new'));
         $status  = $command->execute([
-        	'name' => 'FusionCMS',
-        	'path' => __DIR__.'/output/fusioncms',
-    		'--no-install' => true,
+        	'name'    => 'FusionCMS',
+        	'path'    => __DIR__.'/output/fusioncms',
     		'--quiet' => true
     	]);
 
         $this->assertSame(0, $status);
+        $this->assertDirectoryExists(__DIR__.'/output/fusioncms/vendor/fusioncms');
 	}
 
 	/**

@@ -28,8 +28,7 @@ class NewCommand extends Command
             
             ->addOption('quiet',     'q',   InputOption::VALUE_NONE, 'Do not output any message')
             // ->addOption('nightly',   'm',   InputOption::VALUE_NONE, 'Installs the latest "nightly" release')
-            ->addOption('no-install', null, InputOption::VALUE_NONE, 'Disables jumping into the FusionCMS installation process directly')
-            ;
+            ->addOption('install', null, InputOption::VALUE_NONE, 'Run the FusionCMS Installer after downloading.');
     }
 
     /**
@@ -44,7 +43,7 @@ class NewCommand extends Command
         $name      = $input->getArgument('name');
         $path      = $input->getArgument('path') ?? $name;
         $directory = $path and $path !== '.' ? getcwd().'/'.$path : getcwd();
-        $version   = $this->getArgument('version');
+        $version   = $input->getArgument('version');
         $stability = $this->getStability($input);
 
         if ($version) {
@@ -60,7 +59,7 @@ class NewCommand extends Command
             "{$composer} require fusioncms/cms:{$version}",
         ];
 
-        if (! $input->getOption('no-install')) {
+        if ($input->getOption('install')) {
             $commands[] = 'php artisan fusion:install';
         }
 
@@ -117,9 +116,9 @@ class NewCommand extends Command
     {
         $stability = 'beta';
 
-        if ($input->getOption('nightly')) {
-            $stability = 'dev';
-        }
+        // if ($input->getOption('nightly')) {
+        //     $stability = 'dev';
+        // }
 
         return $stability;
     }
