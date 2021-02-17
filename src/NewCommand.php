@@ -21,14 +21,14 @@ class NewCommand extends Command
         $this
             ->setName('new')
             ->setDescription('Create a new FusionCMS instance')
-            
+
             ->addArgument('name',    InputArgument::REQUIRED, 'Name of your new project.')
             ->addArgument('version', InputArgument::OPTIONAL, 'Requested version.', 'dev-nightly')
             ->addArgument('path',    InputArgument::OPTIONAL, 'Installation path')
-            
+
             ->addOption('quiet',     'q',   InputOption::VALUE_NONE, 'Do not output any message')
             // ->addOption('nightly',   'm',   InputOption::VALUE_NONE, 'Installs the latest "nightly" release')
-            ->addOption('no-install', null, InputOption::VALUE_NONE, 'Do not automatically run the FusionCMS Installer after downloading.');
+            ->addOption('install', null, InputOption::VALUE_NONE, 'Start the FusionCMS installer after downloading');
     }
 
     /**
@@ -54,12 +54,10 @@ class NewCommand extends Command
 
         $composer = $this->findComposer();
         $commands = [
-            "{$composer} create-project laravel/laravel {$directory}",
-            "cd {$directory}",
-            "{$composer} require fusioncms/cms:{$version}",
+            "{$composer} create-project fusioncms/fusioncms {$directory}",
         ];
 
-        if (!$input->getOption('no-install')) {
+        if ($input->getOption('install')) {
             $commands[] = 'php artisan fusion:install';
         }
 
