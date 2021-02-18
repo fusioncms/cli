@@ -54,7 +54,7 @@ class NewCommand extends Command
 
         $composer = $this->findComposer();
         $commands = [
-            "{$composer} create-project fusioncms/fusioncms {$directory}",
+            "{$composer} create-project fusioncms/fusioncms --stability=dev --remove-vcs {$directory}",
         ];
 
         if ($input->getOption('install')) {
