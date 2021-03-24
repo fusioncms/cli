@@ -1,29 +1,60 @@
 <?php
 
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+
 /**
  * Generate a URL friendly "slug" from a given string.
- * Based on \Illuminate\Support\Str::slug
  *
  * @param  string  $title
  * @param  string  $separator
- * @param  string|null  $language
  * @return string
  */
 function slugify($value, $separator = '-')
 {
-	// Convert all dashes/underscores into separator
-	$flip = $separator === '-' ? '_' : '-';
-
-	$value = preg_replace('!['.preg_quote($flip).']+!u', $separator, $value);
-
-	// Replace @ with the word 'at'
-	$value = str_replace('@', $separator.'at'.$separator, $value);
-
-	// Remove all characters that are not the separator, letters, numbers, or whitespace.
-	$value = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', strtolower($value));
-
-	// Replace all separator characters and whitespace by a single separator
-	$value = preg_replace('!['.preg_quote($separator).'\s]+!u', $separator, $value);
+	$value = strtolower($value);
+	$value = preg_replace('/[^0-9a-z]/', $separator, $value);
 
 	return trim($value, $separator);
+}
+
+/**
+ * Target file path and run string replacement method.
+ * 
+ * @param  string  $path
+ * @param  array   $replacements
+ * @return void
+ */
+function replacePlaceholders($path, $replacements = [])
+{
+    if (file_exists($path)) {
+        file_put_contents(
+            $path,
+            strtr(
+                file_get_contents($path),
+                $replacements
+            )
+        );
+    }
+}
+
+/**
+ * Clear contents of specified path.
+ * Ignores dot files.
+ * 
+ * @param  string $path
+ * @return void
+ */
+function cleanDirectory($path)
+{
+	if (is_dir($path)) {
+		$files = (new Finder())->in($path)->depth('== 0');
+		$paths = [];
+
+		foreach ($files as $file) {
+			$paths[] = $file->getPathname();
+		}
+
+		(new Filesystem())->remove($paths);
+	}
 }

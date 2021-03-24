@@ -42,9 +42,12 @@ class MakeAddonCommand extends Command
         $path      = $input->getArgument('path') ?? getcwd();
         $force     = $input->getOption('force') ? true : false;
 
-        $slug = 
-        $addonpath = rtrim("{$path}/{$namespace}", "/") . "/";
-        $stubpath  = __DIR__ . '/stubs/addon';
+        $name   = basename($namespace);
+        $folder = strtolower($name);
+        $slug   = slugify($name);
+
+        $addonpath = rtrim("{$path}/{$folder}", "/") . "/";
+        $stubpath  = __DIR__ . '/../stubs/addon/';
 
         $finder     = new Finder;
         $filesystem = new Filesystem;
@@ -53,21 +56,19 @@ class MakeAddonCommand extends Command
 
         foreach ($finder->in($stubpath) as $file) {
             if ($file->isDir()) {
-                $filesystem->mkdir(
-                    $addonpath . str_replace($stubpath, '', $file->getRealPath())
-                );
-            } else {            
+                $filesystem->mkdir($addonpath . $file->getRelativePathname());
+            } else {
                 $filesystem->copy(
-                    $file->getRealPath(),
-                    $addonpath . str_replace($stubpath, '', $file->getRealPath()),
+                    $stubpath . $file->getRelativePathname(),
+                    $addonpath . $file->getRelativePathname(),
                     $force
                 );
             }
         }
 
-        $this->replacePlaceholders("{$addonpath}composer.json", [
-            '{name}'        => ($name = basename($namespace)),
-            '{slug}'        => ($slug = slugify($name)),
+        replacePlaceholders("{$addonpath}composer.json", [
+            '{name}'        => $name,
+            '{slug}'        => $slug,
             '{namespace}'   => $namespace,
             '{description}' => 'Addon module for FusionCMS.',
         ]);
@@ -75,25 +76,5 @@ class MakeAddonCommand extends Command
         $output->writeln('<info>Addon template created!</info>');
 
         return 0;
-    }
-
-    /**
-     * Target file path and run string replacement method.
-     * 
-     * @param  string $path
-     * @param  array  $replacements
-     * @return void
-     */
-    private function replacePlaceholders($path, $replacements = [])
-    {
-        if (file_exists($path)) {
-            file_put_contents(
-                $path,
-                strtr(
-                    file_get_contents($path),
-                    $replacements
-                )
-            );
-        }
     }
 }

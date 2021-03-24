@@ -7,8 +7,8 @@ use FusionCMS\CLI\Console\NewCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
+// use Symfony\Component\Filesystem\Filesystem;
+// use Symfony\Component\Finder\Finder;
 
 class NewCommandTest extends TestCase
 {
@@ -30,8 +30,8 @@ class NewCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->filesystem = new Filesystem();
-        $this->finder     = new Finder();
+        // $this->filesystem = new Filesystem();
+        // $this->finder     = new Finder();
     }
 
     /**
@@ -40,7 +40,7 @@ class NewCommandTest extends TestCase
 	 */
     public function tearDown(): void
     {
-    	$this->cleanDirectory(__DIR__.'/output');
+    	cleanDirectory(__DIR__.'/output');
     }
 
 	/** @test */
@@ -60,24 +60,24 @@ class NewCommandTest extends TestCase
         $this->assertDirectoryExists(__DIR__.'/output/fusioncms/vendor/fusioncms');
 	}
 
-	/**
-	 * Clean output directory for next test.
-	 * 
-	 * @access private
-	 * @param  string $directory [description]
-	 * @return void
-	 */
-	private function cleanDirectory($directory)
-	{
-		if (is_dir($directory)) {
-			$files = $this->finder->in($directory)->depth('== 0');
-			$paths = [];
+	// /**
+	//  * Clean output directory for next test.
+	//  * 
+	//  * @access private
+	//  * @param  string $directory [description]
+	//  * @return void
+	//  */
+	// private function cleanDirectory($directory)
+	// {
+	// 	if (is_dir($directory)) {
+	// 		$files = $this->finder->in($directory)->depth('== 0');
+	// 		$paths = [];
 
-			foreach ($files as $file) {
-				$paths[] = $file->getPathname();
-			}
+	// 		foreach ($files as $file) {
+	// 			$paths[] = $file->getPathname();
+	// 		}
 
-			$this->filesystem->remove($paths);
-		}
-	}
+	// 		$this->filesystem->remove($paths);
+	// 	}
+	// }
 }
