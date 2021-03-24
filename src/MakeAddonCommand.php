@@ -66,12 +66,20 @@ class MakeAddonCommand extends Command
             }
         }
 
+        /**
+         * Configure `composer.json`
+         */
         replacePlaceholders("{$addonpath}composer.json", [
             '{name}'        => $name,
             '{slug}'        => $slug,
             '{namespace}'   => $namespace,
             '{description}' => 'Addon module for FusionCMS.',
         ]);
+
+        /**
+         * Rename some files for consistency..
+         */
+        $filesystem->rename("{$addonpath}config/stub.php", "{$addonpath}config/{$slug}.php");
 
         $output->writeln('<info>Addon template created!</info>');
 
