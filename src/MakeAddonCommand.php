@@ -42,11 +42,11 @@ class MakeAddonCommand extends Command
         $path      = $input->getArgument('path') ?? getcwd();
         $force     = $input->getOption('force') ? true : false;
 
-        $name   = basename($namespace);
-        $folder = strtolower($name);
-        $slug   = slugify($name);
+        $name = preg_split('/[^a-z]/i', $namespace);
+        $name = end($name);
+        $slug = slugify($namespace);
 
-        $addonpath = rtrim("{$path}/{$folder}", "/") . "/";
+        $addonpath = rtrim("{$path}/{$slug}", "/") . "/";
         $stubpath  = __DIR__ . '/../stubs/addon/';
 
         $finder     = new Finder;
@@ -72,14 +72,18 @@ class MakeAddonCommand extends Command
         replacePlaceholders("{$addonpath}composer.json", [
             '{name}'        => $name,
             '{slug}'        => $slug,
-            '{namespace}'   => $namespace,
+            '{namespace}'   => str_replace('\\', '\\\\', $namespace),
             '{description}' => 'Addon module for FusionCMS.',
         ]);
 
         /**
          * Rename some files for consistency..
          */
-        $filesystem->rename("{$addonpath}config/stub.php", "{$addonpath}config/{$slug}.php");
+        $filesystem->rename(
+            "{$addonpath}config/stub.php",
+            "{$addonpath}config/{$slug}.php",
+            true
+        );
 
         $output->writeln('<info>Addon template created!</info>');
 

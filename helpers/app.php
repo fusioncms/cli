@@ -13,7 +13,7 @@ use Symfony\Component\Finder\Finder;
 function slugify($value, $separator = '-')
 {
 	$value = strtolower($value);
-	$value = preg_replace('/[^0-9a-z]/', $separator, $value);
+	$value = preg_replace('/[^0-9a-z]/i', $separator, $value);
 
 	return trim($value, $separator);
 }
