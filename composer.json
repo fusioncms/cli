@@ -25,6 +25,9 @@
         "bin/fusion"
     ],
     "autoload": {
+        "files": [
+            "helpers/app.php"
+        ],
         "psr-4": {
             "FusionCMS\\CLI\\Console\\": "src"
         }

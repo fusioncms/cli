@@ -1,0 +1,26 @@
+{
+    "name": "{name}",
+    "description": "{description}",
+    "license": "MIT",
+    "authors": [],
+    "version": "0.1.0",
+    "support": {},
+    "autoload": {
+        "classmap": [
+            "database/"
+        ],
+        "psr-4": {
+            "{namespace}": "src/"
+        }
+    },
+    "extra": {
+        "fusioncms": {
+            "name": "{name}"
+        },
+        "laravel": {
+            "providers": [
+            	"{namespace}\\Providers\\{name}ServiceProvider"
+            ]
+        }
+    }
+}
